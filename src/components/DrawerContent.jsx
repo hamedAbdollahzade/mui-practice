@@ -33,15 +33,45 @@ import {
 import { grey, pink } from "@mui/material/colors";
 import { useState } from "react";
 
+const CollapseChildren = ({ data, title = "title" }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <ListItemButton onClick={() => setOpen(!open)}>
+        <ListItemIcon>
+          <InboxRounded />
+        </ListItemIcon>
+        <ListItemText primary={title} />
+        {open ? <ExpandLess /> : <ExpandMore />}
+      </ListItemButton>
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <ListItemIcon>
+              <StarBorder />
+            </ListItemIcon>
+            <ListItemText primary={data?.name} />
+          </ListItemButton>
+          {data.children && <CollapseChildren data={data.children} />}
+        </List>
+      </Collapse>
+    </>
+  );
+};
+
 const DrawerContent = ({ value, handleChange }) => {
+  const DATA = {
+    name: "listOne",
+    children: {
+      name: "ListTwo",
+    },
+  };
   const tabProps = (index) => {
     return {
       id: `simple-tab-${index}`,
       "aria-controls": `simple-tabpanel-${index}`,
     };
   };
-
-  const [open, setOpen] = useState(true);
 
   return (
     <Box
@@ -169,23 +199,7 @@ const DrawerContent = ({ value, handleChange }) => {
           </ListItemIcon>
           <ListItemText primary="Drafts" />
         </ListItemButton>
-        <ListItemButton onClick={() => setOpen(!open)}>
-          <ListItemIcon>
-            <InboxRounded />
-          </ListItemIcon>
-          <ListItemText primary="Inbox" />
-          {open ? <ExpandLess /> : <ExpandMore />}
-        </ListItemButton>
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemIcon>
-                <StarBorder />
-              </ListItemIcon>
-              <ListItemText primary="Starred" />
-            </ListItemButton>
-          </List>
-        </Collapse>
+        <CollapseChildren data={DATA} />
       </List>
 
       <Divider variant="middle" color={grey[900]} sx={{ mt: 2 }} />
